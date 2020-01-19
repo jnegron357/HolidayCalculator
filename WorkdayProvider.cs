@@ -5,18 +5,45 @@ using System.Text;
 namespace TimeTurner
 {
     /// <summary>A component that provides methods for day-of-week calculations</summary>
-    public class WorkdayProvider
+    public static class WorkDayProvider
     {
-        private DayOfWeek targetDay = DateTime.Now.DayOfWeek;
-
-        public WorkdayProvider(DayOfWeek? day = null)
+        public static DateTime Validate(DateTime date)
         {
-            if (day != null) targetDay = day.Value;
+            while (IsNotWorkDay(date)) date.AddDays(1);
+            return date;
         }
 
-        public bool IsWorkDay(DayOfWeek dayOfWeek)
+        public static bool IsNotWorkDay(DateTime dateTime)
         {
-            return (dayOfWeek == targetDay);
+            var day = dateTime.DayOfWeek;
+            switch (day)
+            {
+                case DayOfWeek.Sunday:
+                    return true;
+                case DayOfWeek.Saturday:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static bool IsWorkDay(DayOfWeek day)
+        {
+            switch (day)
+            {
+                case DayOfWeek.Monday:
+                    return true;
+                case DayOfWeek.Tuesday:
+                    return true;
+                case DayOfWeek.Wednesday:
+                    return true;
+                case DayOfWeek.Thursday:
+                    return true;
+                case DayOfWeek.Friday:
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }
