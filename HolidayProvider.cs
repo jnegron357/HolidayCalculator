@@ -3,9 +3,9 @@
 public class HolidayProvider
 {
 	private int targetYear = DateTime.Now.Year;
-
 	public DateTime NewYear = new DateTime(DateTime.Now.Year, 1, 1);
 	public DateTime Christmas = new DateTime(DateTime.Now.Year, 12, 25);
+	public DateTime IndependenceDay = new DateTime(DateTime.Now.Year, 7, 4);
 	public DateTime MemorialDay => GetMemorialDay().Value.Date;
 	public DateTime Thanksgiving => GetThanksgiving().Value.Date;
 	public DateTime LaborDay => GetLaborDay().Value.Date;
@@ -18,8 +18,9 @@ public class HolidayProvider
 	public bool IsHoliday(DateTime date)
 	{
 		if (date == NewYear) return true;
-		if (date == LaborDay) return true;
 		if (date == MemorialDay) return true;
+		if (date == IndependenceDay) return true;
+		if (date == LaborDay) return true;
 		if (date == Thanksgiving) return true;
 		if (date == Christmas) return true;
 		return false;
