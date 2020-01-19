@@ -5,8 +5,7 @@ public static class TimeTools
 	///<summary>Gets first occurance of given day in the given month and year</summary>
 	public static DateTime? GetFirstDay(int year, int month, DayOfWeek targetDay)
 	{
-		var daysInMonth = DateTime.DaysInMonth(year, month);
-		
+		var daysInMonth = DateTime.DaysInMonth(year, month);		
 		for (int day = 1; day <= daysInMonth; day++)
 		{
 			DateTime currentDateTime = new DateTime(year, month, day);
