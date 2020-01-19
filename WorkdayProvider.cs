@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TimeTurner
+namespace TimeMachine
 {
     /// <summary>A component that provides methods for day-of-week calculations</summary>
     public static class WorkDayProvider
     {
         public static DateTime Validate(DateTime date)
         {
-            while (IsNotWorkDay(date)) date.AddDays(1);
+            while (IsNotWorkDay(date)) date = date.AddDays(1);
             return date;
         }
 

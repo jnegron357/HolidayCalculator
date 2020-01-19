@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace TimeTurner
+namespace TimeMachine
 {
     public static class WorkHourProvider
     {
         private static TimeSpan clockIn = new TimeSpan(8, 0, 0);
         private static TimeSpan clockOut = new TimeSpan(12, 0, 0);
-        private static TimeSpan clockInAfter = new TimeSpan(1, 0, 0);
-        private static TimeSpan clockOutAfter = new TimeSpan(5, 0, 0);
+        private static TimeSpan clockInAfter = new TimeSpan(13, 0, 0);
+        private static TimeSpan clockOutAfter = new TimeSpan(17, 0, 0);
         private static bool isNextDay;
 
         public static TimeResult GetValidTime(TimeSpan time)

@@ -1,42 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TimeTurner;
 
-namespace HolidayCalculator
+namespace TimeMachine
 {
     public class TimeTurner
     {
         private HolidayProvider Holidays;
 
-        public TimeTurner(DateTime dateTime)
-        {
-            Holidays = new HolidayProvider(dateTime.Year);
-        }
-
         public DateTime GetEndDate(DateTime start, int minutes)
         {
-            DateTime newStartDate = CheckStartDate(ref start);
-            return CheckEndDate(minutes, newStartDate);
+            Holidays = new HolidayProvider(start.Year);
+            DateTime newStartDate = CheckStartDate(start);
+            return CheckEndDate(newStartDate, minutes);
         }
 
-        private DateTime CheckEndDate(int minutes, DateTime newStartDate)
+        private DateTime CheckEndDate(DateTime newStartDate, int minutes)
         {
             //Check the end date
             var endDate = newStartDate.AddMinutes(minutes);
             endDate = Holidays.Validate(endDate);
             endDate = WorkDayProvider.Validate(endDate);
             var validTime = WorkHourProvider.GetValidTime(endDate.TimeOfDay);
+            endDate = ConstructNewDate(endDate, validTime.Time);
             if (validTime.DayAdded)
             {
-                endDate.AddDays(1);
+                endDate = endDate.AddDays(1);
                 endDate = Holidays.Validate(endDate);
                 endDate = WorkDayProvider.Validate(endDate);
             }
-            return ConstructNewDate(endDate, validTime.Time);
+            return endDate;
         }
 
-        private DateTime CheckStartDate(ref DateTime start)
+        private DateTime CheckStartDate(DateTime start)
         {
             //Check the start date
             start = Holidays.Validate(start);
@@ -44,15 +38,15 @@ namespace HolidayCalculator
             start = WorkDayProvider.Validate(start);
             //Check the hours
             var validTime = WorkHourProvider.GetValidTime(start.TimeOfDay);
+            //Generate new date with valid time
+            start = ConstructNewDate(start, validTime.Time);
             if (validTime.DayAdded)
             {
-                start.AddDays(1);
+                start = start.AddDays(1);
                 start = Holidays.Validate(start);
                 start = WorkDayProvider.Validate(start);
             }
-            //Generate new date
-            var newStartDate = ConstructNewDate(start, validTime.Time);
-            return newStartDate;
+            return start;
         }
 
         private DateTime ConstructNewDate(DateTime date, TimeSpan validTime)
