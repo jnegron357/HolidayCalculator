@@ -2,10 +2,10 @@
 
 public class HolidayProvider
 {
-	private int targetYear = DateTime.Now.Year;
-	public DateTime NewYear = new DateTime(DateTime.Now.Year, 1, 1);
-	public DateTime Christmas = new DateTime(DateTime.Now.Year, 12, 25);
-	public DateTime IndependenceDay = new DateTime(DateTime.Now.Year, 7, 4);
+	private int targetYear = 0;
+	public DateTime NewYear => new DateTime(targetYear, 1, 1);
+	public DateTime Christmas => new DateTime(targetYear, 12, 25);
+	public DateTime IndependenceDay => new DateTime(targetYear, 7, 4);
 	public DateTime MemorialDay => GetMemorialDay().Value.Date;
 	public DateTime Thanksgiving => GetThanksgiving().Value.Date;
 	public DateTime LaborDay => GetLaborDay().Value.Date;
@@ -13,10 +13,18 @@ public class HolidayProvider
 	public HolidayProvider(int? year = null)
 	{
 		if (year != null) targetYear = year.Value;
+		targetYear = DateTime.Now.Year;
+	}
+
+	public DateTime Validate(DateTime date)
+	{
+		while (IsHoliday(date)) date.AddDays(1);
+		return date;
 	}
 
 	public bool IsHoliday(DateTime date)
 	{
+		targetYear = date.Year;
 		if (date == NewYear) return true;
 		if (date == MemorialDay) return true;
 		if (date == IndependenceDay) return true;
@@ -31,7 +39,7 @@ public class HolidayProvider
 		var memorialDay = TimeTools.GetLastDay(targetYear, 5, DayOfWeek.Monday);
 		return memorialDay == null ? DateTime.MinValue : memorialDay;
 	}
-	
+
 	private DateTime? GetLaborDay()
 	{
 		var laborDay = TimeTools.GetFirstDay(targetYear, 9, DayOfWeek.Monday);
@@ -40,8 +48,7 @@ public class HolidayProvider
 
 	private DateTime? GetThanksgiving() 
 	{
-		var thanksgiving = TimeTools.GetLastDay(DateTime.Now.Year, 11, DayOfWeek.Thursday);
+		var thanksgiving = TimeTools.GetLastDay(targetYear, 11, DayOfWeek.Thursday);
 		return thanksgiving == null ? DateTime.MinValue : thanksgiving;
 	}
-
 }
