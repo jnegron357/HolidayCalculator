@@ -11,40 +11,40 @@ namespace TimeMachine
         private static TimeSpan clockOut = new TimeSpan(12, 0, 0);
         private static TimeSpan clockInAfter = new TimeSpan(13, 0, 0);
         private static TimeSpan clockOutAfter = new TimeSpan(17, 0, 0);
-        private static bool isNextDay;
 
-        public static TimeResult GetValidTime(TimeSpan time)
+        public static DateTime Validate(DateTime date)
         {
-            return new TimeResult
-            {
-                Time = CheckTime(time),
-                DayAdded = isNextDay
-            };
-        }
-
-        private static TimeSpan CheckTime(TimeSpan time)
-        {
+            var time = date.TimeOfDay;
             //time is at or before 8AM
-            if (time < clockIn) return clockIn;
+            if (time < clockIn) return GetNewDate(date, time, clockIn);
             //time is between 8AM and 12noon
-            if (time >= clockIn && time <= clockOut) return time;
+            if (time >= clockIn && time <= clockOut) return date;
             //time is between 12noon and 1pm
-            if (time >= clockOut && time <= clockInAfter) return clockInAfter;
+            if (time >= clockOut && time <= clockInAfter) return  GetNewDate(date, time, clockInAfter);
             //time is between 1pm and 5pm
-            if (time >= clockInAfter && time < clockOutAfter) return time;
+            if (time >= clockInAfter && time < clockOutAfter) return date;
             //time is after 5pm
-            if(time >= clockOutAfter)
+            if (time >= clockOutAfter)
             {
-                isNextDay = true;
-                return clockIn;
+                var holidays = new HolidayProvider(date.Year);
+                date = TimeTools.GetNewDate(date.AddDays(1), clockIn);
+                date = WorkDayProvider.Validate(date);
+                date = holidays.Validate(date);
             }
-            return time;
+            return date;
         }
-    }
 
-    public struct TimeResult
-    {
-        public TimeSpan Time { get; set; }
-        public bool DayAdded { get; set; }
+        private static DateTime GetNewDate(DateTime date, TimeSpan time, TimeSpan clockIn)
+        {
+            string clientTime = GetTimeString(time);
+            string clockInTime = GetTimeString(clockIn);
+            var diff = DateTime.Parse(clockInTime).Subtract(DateTime.Parse(clientTime));
+            return date.Add(diff);
+        }
+
+        private static string GetTimeString(TimeSpan time)
+        {
+            return (time.Hours > 12) ? $"{time.Hours}:{time.Minutes}:{time.Seconds} PM" : $"{time.Hours}:{time.Minutes}:{time.Seconds} AM";
+        }
     }
 }

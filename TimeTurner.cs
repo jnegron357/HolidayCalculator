@@ -4,60 +4,31 @@ namespace TimeMachine
 {
     public class TimeTurner
     {
-        private HolidayProvider Holidays;
-
         public DateTime GetEndDate(DateTime start, int minutes)
         {
-            Holidays = new HolidayProvider(start.Year);
-            DateTime newStartDate = CheckStartDate(start);
-            return CheckEndDate(newStartDate, minutes);
+            var holidays = new HolidayProvider(start.Year);
+            DateTime newStartDate = CheckStartDate(start, holidays);
+            return CheckEndDate(newStartDate, minutes, holidays);
         }
 
-        private DateTime CheckEndDate(DateTime newStartDate, int minutes)
-        {
-            //Check the end date
-            var endDate = newStartDate.AddMinutes(minutes);
-            endDate = Holidays.Validate(endDate);
-            endDate = WorkDayProvider.Validate(endDate);
-            var validTime = WorkHourProvider.GetValidTime(endDate.TimeOfDay);
-            endDate = ConstructNewDate(endDate, validTime.Time);
-            if (validTime.DayAdded)
-            {
-                endDate = endDate.AddDays(1);
-                endDate = Holidays.Validate(endDate);
-                endDate = WorkDayProvider.Validate(endDate);
-            }
-            return endDate;
-        }
-
-        private DateTime CheckStartDate(DateTime start)
+        private DateTime CheckStartDate(DateTime start, HolidayProvider holidays)
         {
             //Check the start date
-            start = Holidays.Validate(start);
+            start = holidays.Validate(start);
             //Compensate for Saturday and Sunday
             start = WorkDayProvider.Validate(start);
-            //Check the hours
-            var validTime = WorkHourProvider.GetValidTime(start.TimeOfDay);
-            //Generate new date with valid time
-            start = ConstructNewDate(start, validTime.Time);
-            if (validTime.DayAdded)
-            {
-                start = start.AddDays(1);
-                start = Holidays.Validate(start);
-                start = WorkDayProvider.Validate(start);
-            }
+            //Ensure only work hours are used
+            start = WorkHourProvider.Validate(start);
             return start;
         }
 
-        private DateTime ConstructNewDate(DateTime date, TimeSpan validTime)
+        private DateTime CheckEndDate(DateTime newStartDate, int minutes, HolidayProvider holidays)
         {
-            return new DateTime(
-                date.Year, 
-                date.Month, 
-                date.Day, 
-                validTime.Hours, 
-                validTime.Minutes, 
-                validTime.Seconds);
-        }
+            var endDate = TimeTools.AddMinutes(newStartDate, minutes);
+            endDate = holidays.Validate(endDate);
+            endDate = WorkDayProvider.Validate(endDate);
+            endDate = WorkHourProvider.Validate(endDate);
+            return endDate;
+        }        
     }
 }

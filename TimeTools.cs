@@ -32,6 +32,42 @@ namespace TimeMachine
 			}
 			return null;	
 		}
+
+		public static DateTime AddMinutes(DateTime date, int minutes)
+		{
+			//NOTE: split this into testable fragments
+			int workDayMinutes = 480;
+			int halfDayMinutes = 240;
+			int workDays = Math.Abs(minutes / workDayMinutes);
+			if (workDays < 1)
+			{
+				return date.AddMinutes(minutes); ;
+			}
+			int minLeft = workDayMinutes;
+			for (int i = 0; i <= workDays; i++)
+			{
+				if (minLeft > 0 && minLeft < workDayMinutes)
+				{
+					if (minLeft > halfDayMinutes) minLeft += 60;//add the lunch hour for accurate time
+					return date.AddMinutes(minLeft);
+				}
+				date = date.AddDays(1);
+				minLeft = minutes - workDayMinutes;
+			}
+			return date;
+		}
+
+		public static DateTime GetNewDate(DateTime date, TimeSpan time)
+		{
+			return new DateTime(
+				date.Year,
+				date.Month,
+				date.Day,
+				time.Hours,
+				time.Minutes,
+				time.Seconds);
+		}
+
 	}
 
 }

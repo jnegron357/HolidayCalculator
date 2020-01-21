@@ -27,12 +27,12 @@ namespace TimeMachine
 		public bool IsHoliday(DateTime date)
 		{
 			targetYear = date.Year;
-			if (date == NewYear) return true;
-			if (date == MemorialDay) return true;
-			if (date == IndependenceDay) return true;
-			if (date == LaborDay) return true;
-			if (date == Thanksgiving) return true;
-			if (date == Christmas) return true;
+			if (date.Date == NewYear.Date) return true;
+			if (date.Date == MemorialDay.Date) return true;
+			if (date.Date == IndependenceDay.Date) return true;
+			if (date.Date == LaborDay.Date) return true;
+			if (date.Date == Thanksgiving.Date) return true;
+			if (date.Date == Christmas.Date) return true;
 			return false;
 		}
 
