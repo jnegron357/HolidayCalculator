@@ -1,15 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TimeMachine
 {
     /// <summary>A component that provides methods for day-of-week calculations</summary>
     public static class WorkDayProvider
     {
-        public static DateTime Validate(DateTime date)
+        public static DateTime Validate(DateTime date, HolidayProvider holidays)
         {
-            while (IsNotWorkDay(date)) date = date.AddDays(1);
+            while (IsNotWorkDay(date))
+            {
+                date = date.AddDays(1);
+                date = holidays.Validate(date);
+            }
             return date;
         }
 

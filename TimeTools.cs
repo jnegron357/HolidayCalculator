@@ -33,28 +33,42 @@ namespace TimeMachine
 			return null;	
 		}
 
-		public static DateTime AddMinutes(DateTime date, int minutes)
+		public static DateTime AddMinutes(DateTime date, int minutes, HolidayProvider holidays)
 		{
 			//NOTE: split this into testable fragments
 			int workDayMinutes = 480;
 			int halfDayMinutes = 240;
+			int lunchMinutes = 60;
+			int workDayMinutesWithLunch = workDayMinutes + lunchMinutes;
 			int workDays = Math.Abs(minutes / workDayMinutes);
 			if (workDays < 1)
 			{
 				return date.AddMinutes(minutes); ;
 			}
-			int minLeft = workDayMinutes;
-			for (int i = 0; i <= workDays; i++)
+			int minLeft = minutes;
+			
+			//Console.WriteLine($"  work days: {workDays}");
+
+			for (int i = 0; i <= workDays-1; i++)
 			{
 				if (minLeft > 0 && minLeft < workDayMinutes)
 				{
-					if (minLeft > halfDayMinutes) minLeft += 60;//add the lunch hour for accurate time
+					if (minLeft > halfDayMinutes) minLeft += lunchMinutes;//add the lunch hour for accurate time
 					return date.AddMinutes(minLeft);
 				}
-				date = date.AddDays(1);
-				minLeft = minutes - workDayMinutes;
+				date = date.AddMinutes(workDayMinutesWithLunch);
+				minLeft -= workDayMinutes;
+				if (minLeft >= workDayMinutes) date = GetNewWorkDay(date, holidays);
 			}
 			return date;
+		}
+
+		private static DateTime GetNewWorkDay(DateTime date, HolidayProvider holidays)
+		{
+			var newDate = GetNewDate(date.AddDays(1), new TimeSpan(8, 0, 0));
+			newDate = WorkDayProvider.Validate(newDate, holidays);
+			newDate = WorkHourProvider.Validate(newDate, holidays);
+			return holidays.Validate(newDate);
 		}
 
 		public static DateTime GetNewDate(DateTime date, TimeSpan time)
@@ -68,6 +82,9 @@ namespace TimeMachine
 				time.Seconds);
 		}
 
+		public static string GetDateString(this DateTime date)
+		{
+			return $"{date.ToLongDateString()} {date.ToLongTimeString()}";
+		}
 	}
-
 }

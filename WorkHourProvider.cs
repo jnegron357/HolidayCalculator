@@ -12,7 +12,7 @@ namespace TimeMachine
         private static TimeSpan clockInAfter = new TimeSpan(13, 0, 0);
         private static TimeSpan clockOutAfter = new TimeSpan(17, 0, 0);
 
-        public static DateTime Validate(DateTime date)
+        public static DateTime Validate(DateTime date, HolidayProvider holidays)
         {
             var time = date.TimeOfDay;
             //time is at or before 8AM
@@ -23,12 +23,13 @@ namespace TimeMachine
             if (time >= clockOut && time <= clockInAfter) return  GetNewDate(date, time, clockInAfter);
             //time is between 1pm and 5pm
             if (time >= clockInAfter && time < clockOutAfter) return date;
+            //time is 5pm
+            if (time == clockOutAfter) return date;
             //time is after 5pm
             if (time >= clockOutAfter)
             {
-                var holidays = new HolidayProvider(date.Year);
                 date = TimeTools.GetNewDate(date.AddDays(1), clockIn);
-                date = WorkDayProvider.Validate(date);
+                date = WorkDayProvider.Validate(date, holidays);
                 date = holidays.Validate(date);
             }
             return date;
